@@ -1,15 +1,16 @@
 package App::Syndicator;
-
-our $VERSION = '0.003';
+BEGIN {
+  $App::Syndicator::VERSION = '0.004';
+}
 
 use MooseX::Declare;
 
 class App::Syndicator with (App::Syndicator::Config, 
     MooseX::Getopt::Dashes) {
-    use App::Syndicator::Types qw/File UriArray/;
-    use MooseX::Types::Moose qw/Bool HashRef/;
+    use App::Syndicator::Types qw/File WritableFile UriArray/;
     use App::Syndicator::UI;
     use App::Syndicator::DB;
+    use IO::All;
 
     our $BASE = "$ENV{HOME}/.syndicator";
 
@@ -25,11 +26,19 @@ class App::Syndicator with (App::Syndicator::Config,
         isa => UriArray,
         coerce => 1,
         required => 1,
+        traits => ['NoGetopt']
+    );
+
+    has dbfile => (
+        is => 'ro',
+        isa => WritableFile,
+        required => 1,
+        default => "$BASE/main.db"
     );
 
     method run {
         my $db = App::Syndicator::DB->new(
-            dsn => "DBI:SQLite:dbname=$BASE/main.db",
+            dsn => "DBI:SQLite:dbname=".$self->dbfile,
             sources => $self->sources,
         );
 
@@ -48,6 +57,10 @@ __END__
 
 App::Syndicator - Curses interface for reading RSS / ATOM feeds.
 
+=head1 VERSION
+
+version 0.004
+
 =head1 USAGE
 
  # first run
@@ -58,6 +71,8 @@ App::Syndicator - Curses interface for reading RSS / ATOM feeds.
 
  # run
  $ syndicator 2> errors.log
+
+ $ syndicator --config=config.any --db=sqlite.db
 
 =head2 EXAMPLE CONFIG
 

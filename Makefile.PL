@@ -1,34 +1,73 @@
-use inc::Module::Install;
 
-name 'App-Syndicator';
-abstract_from 'lib/App/Syndicator.pm';
-version 0.003;
-license 'perl';
-perl_version '5.008';
+use strict;
+use warnings;
 
-requires 'MooseX::Declare' => 0.33;
-requires 'MooseX::Types' => 0.23;
-requires 'MooseX::Types::URI' => 0.02;
-requires 'MooseX::Types::DateTime' => 0.05;
-requires 'MooseX::Getopt' => 0.31;
-requires 'MooseX::ConfigFromFile' => 0.02;
-requires 'Config::Any' => 0.20;
-requires 'JSON::Any' => 1.22;
-requires 'HTML::FormatText' => 2.04;
-requires 'Curses::UI' => 0.9607;
-requires 'XML::Feed::Aggregator' => 0.03;
-requires 'KiokuDB' => 0.49;
-requires 'KiokuDB::Backend::DBI' => 1.15;
-requires 'DateTime' => 0.61;
-requires 'Digest::MD5' => 2.39;
-requires 'DBD::SQLite' => 1.29;
-requires 'Try::Tiny' => 0.06;
-requires 'IO::All' => 0.41;
 
-test_requires 'Test::More' => 0.94;
-test_requires 'Test::UseAllModules' => 0.12;
 
-install_script "syndicator";
-tests "t/*.t";
+use ExtUtils::MakeMaker 6.31;
 
-WriteAll;
+
+
+my %WriteMakefileArgs = (
+  'ABSTRACT' => 'Curses interface for reading RSS / ATOM feeds.',
+  'AUTHOR' => 'Robin Edwards <rge@cpan.org>',
+  'BUILD_REQUIRES' => {
+    'Test::More' => '0.94',
+    'Test::UseAllModules' => '0.12'
+  },
+  'CONFIGURE_REQUIRES' => {
+    'ExtUtils::MakeMaker' => '6.31'
+  },
+  'DISTNAME' => 'App-Syndicator',
+  'EXE_FILES' => [
+    'scripts/syndicator'
+  ],
+  'LICENSE' => 'perl',
+  'NAME' => 'App::Syndicator',
+  'PREREQ_PM' => {
+    'Config::Any' => '0.20',
+    'Curses::UI' => '0.9607',
+    'DBD::SQLite' => '1.29',
+    'DateTime' => '0.61',
+    'Digest::MD5' => '2.39',
+    'HTML::FormatText' => '2.04',
+    'IO::All' => '0.41',
+    'JSON::Any' => '1.22',
+    'KiokuDB' => '0.49',
+    'KiokuDB::Backend::DBI' => '1.15',
+    'MooseX::ConfigFromFile' => '0.02',
+    'MooseX::Declare' => '0.33',
+    'MooseX::Getopt' => '0.31',
+    'MooseX::Types' => '0.23',
+    'MooseX::Types::DateTime' => '0.05',
+    'MooseX::Types::URI' => '0.02',
+    'Try::Tiny' => '0.06',
+    'XML::Feed::Aggregator' => '0.03'
+  },
+  'VERSION' => '0.004',
+  'test' => {
+    'TESTS' => 't/*.t'
+  }
+);
+
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
+  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
+  my $pp = $WriteMakefileArgs{PREREQ_PM};
+  for my $mod ( keys %$br ) {
+    if ( exists $pp->{$mod} ) {
+      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
+    }
+    else {
+      $pp->{$mod} = $br->{$mod};
+    }
+  }
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+WriteMakefile(%WriteMakefileArgs);
+
+
+

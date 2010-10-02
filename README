@@ -1,36 +1,43 @@
-App-Syndicator version 0.002
-===========================
 NAME
-       App::Syndicator - Curses interface for reading RSS / ATOM feeds.
+    App::Syndicator - Curses interface for reading RSS / ATOM feeds.
+
+VERSION
+    version 0.004
 
 USAGE
-   # first run
-   $ syndicator --init
+     # first run
+     $ syndicator --init
 
-   # add your own feeds
-   $ vim ~/.syndicator/config.json 
+     # add your own feeds
+     $ vim ~/.syndicator/config.json 
 
-   # run
-   $ syndicator 2> errors.log
+     # run
+     $ syndicator 2> errors.log
 
-INSTALLATION
+     $ syndicator --config=config.any --db=sqlite.db
 
-To install this module type the following:
+  EXAMPLE CONFIG
+     {
+        "sources": [
+                "http://blogs.perl.org/atom.xml",
+                "http://www.perl.org/pub/atom.xml",
+                "http://planet.perl.org/rss20.xml",
+                "http://ironman.enlightenedperl.org/atom.xml",
+                "http://rss.slashdot.org/Slashdot/slashdot",
+                "http://www.theregister.co.uk/software/headlines.atom"
+        ]
+    }
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+SEE ALSO
+    XML::Feed::Aggregator
 
 AUTHOR
-       Rob Edwards, <rge@cpan.org>
+    Rob Edwards, <rge@cpan.org>
 
-COPYRIGHT AND LICENCE
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Rob Edwards
 
-Put the correct copyright and licence information here.
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.1 or, at
+    your option, any later version of Perl 5 you may have available.
 
-Copyright (C) 2010 by Rob Edwards
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.12.1 or,
-at your option, any later version of Perl 5 you may have available.

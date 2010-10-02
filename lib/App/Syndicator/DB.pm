@@ -77,6 +77,14 @@ class App::Syndicator::DB {
                         data_type => "boolean",
                         is_nullable => 0,
                     },
+                    is_deleted => {
+                        data_type => "boolean",
+                        is_nullable => 0,
+                    },
+                    star => {
+                        data_type => "boolean",
+                        is_nullable => 0,
+                    },
                     title => {
                         data_type => "text",
                         is_nullable => 0,
@@ -117,11 +125,20 @@ class App::Syndicator::DB {
             next if eval { $self->lookup($msg->id) };
 
             if ($self->directory->store($msg->id => $msg)) {
-               push @new_messages, $msg;
+                push @new_messages, $msg;
+                $self->inc_unread;
+                $self->inc_total;
             }
         }
 
-        return @new_messages;
+        if (wantarray) {
+            return sort {
+                $b->published->compare($a->published)
+            } @new_messages;
+        }
+        else {
+            return scalar @new_messages;
+        }
     } 
 
     method all_messages {
@@ -131,7 +148,10 @@ class App::Syndicator::DB {
             $_;
         } sort {
             $b->published->compare($a->published)
-        } $self->directory->all_objects->items;
+        } 
+        $self->directory->search(
+            {is_deleted => 0},
+        )->all;
     }
 
 }

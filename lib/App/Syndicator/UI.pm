@@ -12,7 +12,8 @@ class App::Syndicator::UI  {
         default =>  sub { 
             Curses::UI->new(
                 -color_support => 1,
-                -clear_on_exit => 1
+                -clear_on_exit => 1,
+                -mouse_support => 0,
             ) 
         }, 
         handles => [qw/set_binding mainloop schedule_event/]
@@ -86,6 +87,28 @@ class App::Syndicator::UI  {
         default => 'message_list'
     );
 
+our $help_text = << 'EOD';
+Key bindings
+
+f     - fetch messages
+d     - delete selected messages
+r     - toggle read
+s     - toggle star
+j     - move up
+k     - down down
+/     - search forwards
+?     - search backwards
+space - select or de-select
+tab   - switch focus"
+h     - help (this screen)
+q     - quit
+
+Links
+
+* CPAN   - http://search.cpan.org/~rge/
+* GitHub - http://github.com/robinedwards/App-Syndicator
+EOD
+
     method _build_status_window {
         my $status_win = $self->curses->add(
             'status', 'Window',
@@ -101,7 +124,7 @@ class App::Syndicator::UI  {
     method _build_main_window {
         my $main_win = $self->curses->add(
             'main', 'Window',
-            -y => 10,
+            -y => 12,
             -border => 0,
         );
 
@@ -111,7 +134,7 @@ class App::Syndicator::UI  {
     method _build_header_window {
         my $header_win = $self->curses->add(
             'header', 'Window',
-            -y => 9,
+            -y => 11,
             -height => 1,
             -bg => 'blue',
             -fg => 'white',
@@ -124,7 +147,7 @@ class App::Syndicator::UI  {
         my $list_win = $self->curses->add(
             'list', 'Window',
             -y => 1,
-            -height => 8,
+            -height => 10,
             -border => 0,
         );
 
@@ -139,6 +162,8 @@ class App::Syndicator::UI  {
 
         my $textview = $self->main_window->add(
             'reader', 'TextViewer',
+            -wrapping => 1,
+            -vscrollbar => 'right',
         );
         $self->viewer($textview);
 
@@ -167,7 +192,8 @@ class App::Syndicator::UI  {
         );
         $self->home;
         $self->_update_message_count;
-        $self->list_window->focus;
+        $self->curses->layout;
+        $self->switch_focus;
     }
 
     method _bind_keys {
@@ -175,19 +201,20 @@ class App::Syndicator::UI  {
         $self->set_binding( sub { $self->fetch_messages }, "f");
         $self->set_binding( sub { $self->message_delete }, "d");
         $self->set_binding( sub { $self->message_toggle_read }, "r");
+        $self->set_binding( sub { $self->message_toggle_star }, "s");
         $self->set_binding( sub { $self->home }, "h");
         $self->set_binding( sub { $self->switch_focus }, "\t");
     }
 
     method message_delete {
-
         for my $id ($self->_selected_messages) {
             my $pos = $self->message_list->{-ypos};
             delete $self->message_list->labels->{$id};
             
             my $msg = $self->db->lookup($id);
+            $msg->delete;
+            $self->db->store($msg);
             $self->db->dec_unread unless $msg->is_read;
-            $self->db->delete($id);
             $self->db->dec_total;
 
             $self->message_list->values([
@@ -195,6 +222,7 @@ class App::Syndicator::UI  {
                     @{$self->message_list->values}
             ]);
 
+            # select next in list
             $self->message_list->{-ypos} 
                 = $pos <= $self->message_list->{-max_selected}
                     ? $pos : $self->message_list->{-max_selected};
@@ -203,8 +231,6 @@ class App::Syndicator::UI  {
         }
 
         $self->_update_message_count;
-
-        $self->message_list->focus;
     }
 
     method message_toggle_read {
@@ -215,14 +241,12 @@ class App::Syndicator::UI  {
 
             if ($msg->is_read) {
                 $self->message_list->labels->{$id}
-                    = $msg->title;
-
+                    = $msg->render_title;
                 $self->db->dec_unread;
             }
             else {
                 $self->message_list->labels->{$id}
-                    = "<bold>".$msg->title."</bold>";
-
+                = $msg->render_title;
                 $self->db->inc_unread;
             }
 
@@ -230,48 +254,53 @@ class App::Syndicator::UI  {
         }
 
         $self->_update_message_count;
-        $self->message_list->focus;
+        $self->curses->layout;
+    }
+
+    method message_toggle_star {
+        for my $id ($self->_selected_messages) {
+            my $msg = $self->db->lookup($id);
+
+            $msg->star(!$msg->star);
+
+            if ($msg->star) {
+                $self->message_list->labels->{$id}
+                    = $msg->render_title;
+            }
+            else {
+                $self->message_list->labels->{$id}
+                    = $msg->render_title;
+            }
+
+            $self->db->store($msg);
+        }
+
+        $self->_update_message_count;
+        $self->curses->layout;
     }
 
     method fetch_messages {
         $self->_status_text('Fetching messages..');
 
-        my @msgs = $self->db->fetch;
+        unless (scalar @{$self->message_list->values}) {
+            $self->_populate_message_list($self->db->fetch);
+        }
+        else {
+            for my $msg ($self->db->fetch) {
+                unshift @{$self->message_list->values}, $msg->id;
 
-        for my $msg (@msgs) {
-            push @{$self->message_list->values}, $msg->id;
-            $self->message_list->labels->{$msg->id} 
-            = '<underline>'.$msg->title.'</underline>';
+                $self->message_list->labels->{$msg->id} 
+                    = $msg->render_title;
+            }
         }
 
         $self->_update_message_count;
+        $self->curses->layout;
         $self->switch_focus;
     }
 
     method home {
         $self->_status_text('Help');
-        my $help_text = << 'EOD';
-
-Key bindings
-
-f     - fetch messages
-d     - delete selected messages
-r     - toggle read
-j     - move up
-k     - down down
-/     - search forwards
-?     - search backwards
-space - select or de-select
-tab   - switch focus"
-h     - help (this screen)
-q     - quit
-
-Links
-
-* CPAN   - http://search.cpan.org/~rge/
-* GitHub - http://github.com/robinedwards/App-Syndicator
-
-EOD
         $self->_viewer_text($help_text);
     }
 
@@ -303,8 +332,7 @@ EOD
 
         $self->message_list->labels(
             { map { 
-                $_->id => 
-                    $_->is_read ? $_->title : '<bold>'.$_->title.'</bold>'
+                $_->id => $_->render_title
                 } @messages 
             }
         );
@@ -320,22 +348,8 @@ EOD
         my $msg = eval { $self->db->lookup($msg_id) };
         return unless defined $msg;
 
-        $self->_message_mark_read($msg)
-            unless $msg->is_read;
         $self->_render_message($msg);
         $self->message_list->focus;
-        $self->focus('message_list');
-    }
-
-    method _message_mark_read (Message_T $msg) {
-        $self->db->dec_unread
-            unless $msg->is_read;
-
-        $msg->is_read(1);
-        $self->db->store($msg);
-        
-        $self->_update_message_count;
-        $self->message_list->labels->{$msg->id} = $msg->title;
     }
 
     method _update_message_count {
@@ -359,17 +373,18 @@ EOD
     
     method _viewer_text (Str $text){
         $self->viewer->text($text);
-        $self->viewer->focus;
+        $self->viewer->cursor_to_home;
+        $self->curses->layout;
     }
 
     method _status_text (Str $text?) {
         $text =~ s/\n//g;
 
         $self->status_bar->text(
-            "App::Syndicator | $text\n"
+            "App::Syndicator | $text"
         );
-
-        $self->status_bar->focus;
+        
+        $self->curses->layout;
     }
-}
 
+}
