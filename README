@@ -2,7 +2,7 @@ NAME
     App::Syndicator - Curses interface for reading RSS / ATOM feeds.
 
 VERSION
-    version 0.004
+    version 0.005
 
 USAGE
      # first run
@@ -31,8 +31,13 @@ USAGE
 SEE ALSO
     XML::Feed::Aggregator
 
+CONTRIBUTE
+    http://github.com/robinedwards/App-Syndicator
+
 AUTHOR
-    Rob Edwards, <rge@cpan.org>
+    Rob Edwards, <robin.ge@gmail.com>
+
+    Tweeter: @thefeatheryone
 
 COPYRIGHT AND LICENSE
     Copyright (C) 2010 by Rob Edwards

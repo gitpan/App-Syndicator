@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     'DBD::SQLite' => '1.29',
     'DateTime' => '0.61',
     'Digest::MD5' => '2.39',
-    'HTML::FormatText' => '2.04',
+    'HTML::FormatText::WithLinks' => '0.11',
     'IO::All' => '0.41',
     'JSON::Any' => '1.22',
     'KiokuDB' => '0.49',
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     'Try::Tiny' => '0.06',
     'XML::Feed::Aggregator' => '0.03'
   },
-  'VERSION' => '0.004',
+  'VERSION' => '0.005',
   'test' => {
     'TESTS' => 't/*.t'
   }

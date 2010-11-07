@@ -5,6 +5,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
+err
 example_config
 foo.db
 lib/App/Syndicator.pm
