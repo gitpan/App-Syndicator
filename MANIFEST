@@ -4,6 +4,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+TODO
 dist.ini
 err
 example_config
@@ -11,6 +12,7 @@ foo.db
 lib/App/Syndicator.pm
 lib/App/Syndicator/Config.pm
 lib/App/Syndicator/DB.pm
+lib/App/Syndicator/FeedReader.pm
 lib/App/Syndicator/HtmlToAscii.pm
 lib/App/Syndicator/Message.pm
 lib/App/Syndicator/Types.pm

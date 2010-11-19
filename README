@@ -2,7 +2,7 @@ NAME
     App::Syndicator - Curses interface for reading RSS / ATOM feeds.
 
 VERSION
-    version 0.005
+    version 0.006
 
 USAGE
      # first run

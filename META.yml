@@ -33,4 +33,4 @@ requires:
   MooseX::Types::URI: 0.02
   Try::Tiny: 0.06
   XML::Feed::Aggregator: 0.03
-version: 0.005
+version: 0.006
