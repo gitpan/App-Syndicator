@@ -1,7 +1,8 @@
 package App::Syndicator;
 BEGIN {
-  $App::Syndicator::VERSION = '0.006';
+  $App::Syndicator::VERSION = '0.0061';
 }
+# Dist::Zilla: +PodWeaver
 
 use MooseX::Declare;
 
@@ -50,15 +51,21 @@ class App::Syndicator with (App::Syndicator::Config,
 }
 
 1;
-__END__
+
+
+=pod
 
 =head1 NAME
 
-App::Syndicator - Curses interface for reading RSS / ATOM feeds.
+App::Syndicator
 
 =head1 VERSION
 
-version 0.006
+version 0.0061
+
+=head1 NAME
+
+App::Syndicator - Curses interface for reading feeds.
 
 =head1 USAGE
 
@@ -88,24 +95,21 @@ version 0.006
 
 =head1 SEE ALSO
 
-XML::Feed::Aggregator
-
-=head1 CONTRIBUTE
-
-http://github.com/robinedwards/App-Syndicator
+L<XML::Feed::Aggregator>
 
 =head1 AUTHOR
 
-Rob Edwards, E<lt>robin.ge@gmail.comE<gt>
-
-Tweeter: @thefeatheryone
+Robin Edwards <robin.ge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010 by Rob Edwards
+This software is copyright (c) 2011 by Robin Edwards.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.12.1 or,
-at your option, any later version of Perl 5 you may have available.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+
+__END__
+

@@ -9,8 +9,8 @@ use ExtUtils::MakeMaker 6.31;
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'Curses interface for reading RSS / ATOM feeds.',
-  'AUTHOR' => 'Robin Edwards <rge@cpan.org>',
+  'ABSTRACT' => 'Curses interface for reading feeds.',
+  'AUTHOR' => 'Robin Edwards <robin.ge@gmail.com>',
   'BUILD_REQUIRES' => {
     'Test::More' => '0.94',
     'Test::UseAllModules' => '0.12'
@@ -42,9 +42,9 @@ my %WriteMakefileArgs = (
     'MooseX::Types::DateTime' => '0.05',
     'MooseX::Types::URI' => '0.02',
     'Try::Tiny' => '0.06',
-    'XML::Feed::Aggregator' => '0.03'
+    'XML::Feed::Aggregator' => '0.0400'
   },
-  'VERSION' => '0.006',
+  'VERSION' => '0.0061',
   'test' => {
     'TESTS' => 't/*.t'
   }

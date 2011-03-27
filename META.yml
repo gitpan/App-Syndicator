@@ -1,7 +1,7 @@
 ---
-abstract: 'Curses interface for reading RSS / ATOM feeds.'
+abstract: 'Curses interface for reading feeds.'
 author:
-  - 'Robin Edwards <rge@cpan.org>'
+  - 'Robin Edwards <robin.ge@gmail.com>'
 build_requires:
   Test::More: 0.94
   Test::UseAllModules: 0.12
@@ -32,5 +32,9 @@ requires:
   MooseX::Types::DateTime: 0.05
   MooseX::Types::URI: 0.02
   Try::Tiny: 0.06
-  XML::Feed::Aggregator: 0.03
-version: 0.006
+  XML::Feed::Aggregator: 0.0400
+resources:
+  bugtracker: https://github.com/robinedwards/App-Syndicator/issues
+  homepage: http://search.cpan.org/~rge/App-Syndicator/lib/App/Syndicator.pm
+  repository: git://github.com/robinedwards/App-Syndicator.git
+version: 0.0061
